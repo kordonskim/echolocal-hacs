@@ -6,7 +6,7 @@ import { isBoard } from "./boards";
 import { index, tag, type Index, type Tagged } from "./keys";
 import type { HassDevice, HomeAssistant } from "./types";
 
-export const MANUFACTURER = "EchoLocal";
+export const MANUFACTURERS = ["EchoLocal", "LANovo"];
 
 const ESPHOME = "esphome";
 
@@ -60,7 +60,7 @@ export function isSatellite(
   hass: HomeAssistant | undefined,
   deviceId: string,
 ): boolean {
-  if (hass?.devices?.[deviceId]?.manufacturer !== MANUFACTURER) return false;
+  if (!hass || !MANUFACTURERS.includes(hass.devices?.[deviceId]?.manufacturer ?? "")) return false;
   return partsOf(hass, deviceId).some(esphomeMade);
 }
 

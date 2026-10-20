@@ -3,7 +3,9 @@ __pycache__/
 node_modules/
 .DS_Store
 
-dev/
+dev/*
+!dev/testha.py
+!dev/devices.example.yaml
 
 custom_components/echolocal/frontend/*.map
 .ruff_cache/

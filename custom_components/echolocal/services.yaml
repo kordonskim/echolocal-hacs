@@ -28,3 +28,36 @@ unassign_tone:
           filter:
             - integration: esphome
               manufacturer: EchoLocal
+ping:
+  fields:
+    protocol:
+      required: true
+      example: 1
+      selector:
+        number:
+          min: 1
+          max: 1000
+          mode: box
+camera_webrtc:
+  fields:
+    entity_id:
+      required: true
+      selector:
+        entity:
+          domain: camera
+    offer:
+      required: true
+      selector:
+        text:
+          multiline: true
+camera_webrtc_close:
+  fields:
+    entity_id:
+      required: true
+      selector:
+        entity:
+          domain: camera
+    session:
+      required: true
+      selector:
+        text:

@@ -13,6 +13,7 @@ import "./tabs/activity";
 import "./tabs/health";
 import "./tabs/words";
 import "./tabs/tones";
+import "./tabs/actions";
 
 @customElement("echolocal-panel")
 export class EchoLocalPanel extends LitElement {

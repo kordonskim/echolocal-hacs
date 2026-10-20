@@ -39,6 +39,29 @@
         "tone": { "name": "Tone", "description": "The tone's key." },
         "device_id": { "name": "Devices", "description": "The devices to remove it from." }
       }
+    },
+    "ping": {
+      "name": "Ping",
+      "description": "Answers whether this integration speaks a device's protocol version.",
+      "fields": {
+        "protocol": { "name": "Protocol", "description": "The device's protocol version." }
+      }
+    },
+    "camera_webrtc": {
+      "name": "Camera WebRTC",
+      "description": "Opens a WebRTC session to a camera and returns the answer.",
+      "fields": {
+        "entity_id": { "name": "Camera", "description": "The camera to stream." },
+        "offer": { "name": "Offer", "description": "The device's SDP offer." }
+      }
+    },
+    "camera_webrtc_close": {
+      "name": "Close camera WebRTC",
+      "description": "Closes a WebRTC session opened with Camera WebRTC.",
+      "fields": {
+        "entity_id": { "name": "Camera", "description": "The camera that was streamed." },
+        "session": { "name": "Session", "description": "The session to close." }
+      }
     }
   }
 }

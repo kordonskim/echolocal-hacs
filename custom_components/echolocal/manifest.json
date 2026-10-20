@@ -9,7 +9,9 @@
     "esphome",
     "frontend",
     "http",
+    "media_source",
     "panel_custom",
+    "tts",
     "websocket_api"
   ],
   "documentation": "https://github.com/ygelfand/echolocal-hacs",

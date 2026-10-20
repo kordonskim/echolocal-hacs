@@ -5,6 +5,7 @@
 
 import { LitElement, html, nothing, unsafeCSS } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
+import { unsafeSVG } from "lit/directives/unsafe-svg.js";
 
 import { HOLD, SEGMENTS, art, type Lux, type Segment } from "./art";
 import styles from "./card.css";
@@ -141,7 +142,7 @@ export class EchoLocalSatelliteCard extends LitElement {
   }
 
   private shellFor(state: Satellite): Shell {
-    if (lookOf(state.board).shape === "show") return "charcoal";
+    if (lookOf(state.board).shape !== "dot") return "charcoal";
 
     const forced = this.config?.shell;
     if (forced && forced !== "auto") return forced;
@@ -179,9 +180,13 @@ export class EchoLocalSatelliteCard extends LitElement {
             class="art"
             data-shell=${this.shellFor(state)}
             data-activity=${doing}
-            style=${look.shape === "show" ? `max-width:${look.width}px` : ""}
+            style=${look.shape === "dot" ? "" : `max-width:${look.width}px`}
           >
-            ${look.shape === "show" ? this.show(state, doing, look.lens) : art(
+            ${look.shape === "panel"
+              ? unsafeSVG(look.picture)
+              : look.shape === "show"
+                ? this.show(state, doing, look.lens)
+                : art(
               {
                 segments: this.segments(state),
                 glow: this.glow(state),

@@ -5,6 +5,7 @@ DOMAIN = "echolocal"
 # How our devices are found. echod reports it, the esphome integration writes it to the device and
 # every sub-device, and the UI cannot edit it. Platform is no use: every ESPHome device is esphome.
 MANUFACTURER = "EchoLocal"
+MANUFACTURERS = frozenset({MANUFACTURER, "LANovo"})
 
 CONF_SIDEBAR = "sidebar"
 
@@ -29,3 +30,5 @@ EVENT_DOMAIN = "esphome"
 
 # What a device calls a finished turn, fired whole under the device's domain.
 TURN_EVENT = f"{EVENT_DOMAIN}.echolocal_turn"
+
+ACTIONS_EVENT = f"{EVENT_DOMAIN}.countertop_actions"

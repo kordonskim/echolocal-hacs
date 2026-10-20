@@ -92,7 +92,14 @@ text.lux .unit {
   --el-shutter: #5b5e63;
 }
 
-.frame[data-shape="show"] .side {
+.frame[data-shape="panel"] .art svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.frame[data-shape="show"] .side,
+.frame[data-shape="panel"] .side {
   display: grid;
   grid-template-columns: repeat(2, 40px);
   align-content: center;

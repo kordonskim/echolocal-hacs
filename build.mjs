@@ -24,7 +24,7 @@ const options = {
   bundle: true,
   format: "esm",
   target: "es2022",
-  loader: { ".css": "text" },
+  loader: { ".css": "text", ".svg": "text" },
   legalComments: "inline",
   logLevel: "info",
 };

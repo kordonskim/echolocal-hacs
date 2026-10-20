@@ -1,0 +1,15 @@
+devices:
+  - name: blueberry
+    host: 192.168.1.20
+    adb: HUA03RW0
+    product: lanovo
+  - name: athena
+    host: 192.168.1.21
+    adb: G6G1GM10142500SD
+    product: echolocal
+  - name: checkers
+    host: 192.168.1.22
+    product: echolocal
+  - name: kitchen
+    host: 192.168.1.23
+    key: base64-noise-key-from-your-ha

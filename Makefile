@@ -16,14 +16,8 @@ version: ## Print the manifest version
 	@echo $(VERSION)
 
 .PHONY: deps
-deps: hooks ## Install the frontend build dependencies and the git hooks
+deps: ## Install the frontend build dependencies
 	npm ci
-
-.PHONY: hooks
-hooks: ## Point git at .githooks, so the bundle rebuilds on commit
-	git config core.hooksPath .githooks
-	@chmod +x .githooks/*
-	@echo "hooks: core.hooksPath = .githooks"
 
 node_modules: package-lock.json
 	npm ci
@@ -51,16 +45,19 @@ lint: node_modules ## Lint the Python and typecheck the frontend
 fmt: ## Format the Python
 	ruff format $(COMPONENT)
 
-.PHONY: fresh
-fresh: build ## Fail if the committed bundle is not what the sources build
-	@git ls-files --error-unmatch $(BUNDLE) >/dev/null 2>&1 \
-		|| { echo "$(BUNDLE) is untracked — git add it, or this check means nothing"; exit 1; }
-	@git diff --quiet -- $(BUNDLE) \
-		|| { echo "$(BUNDLE) is out of date — run make build and commit it"; exit 1; }
-	@echo "bundle is current"
+.PHONY: zip
+zip: build ## Build echolocal.zip, what HACS installs (VERSION=x.y.z stamps the manifest)
+	@/bin/rm -rf dist echolocal.zip
+	@mkdir -p dist
+	@/bin/cp -R $(COMPONENT) dist/echolocal
+	@find dist -name __pycache__ -prune -exec /bin/rm -rf {} +
+	@python3 -c "import json, sys; p = 'dist/echolocal/manifest.json'; m = json.load(open(p)); \
+		m['version'] = sys.argv[1]; open(p, 'w').write(json.dumps(m, indent=2) + '\n')" "$(VERSION)"
+	@cd dist/echolocal && zip -qr ../../echolocal.zip .
+	@echo "echolocal.zip $(VERSION)"
 
 .PHONY: check
-check: lint fresh ## Validate the manifests, lint, and confirm the bundle is current
+check: lint build ## Validate the manifests, lint, and build the bundle
 	@python3 -m json.tool $(COMPONENT)/manifest.json >/dev/null && echo "manifest.json ok"
 	@python3 -m json.tool hacs.json >/dev/null && echo "hacs.json ok"
 	@python3 -m compileall -q $(COMPONENT) && echo "compile ok"
@@ -77,6 +74,40 @@ brand: ## Regenerate the brand icons Home Assistant serves from the integration 
 preview: build ## Serve the card and dashboard preview against a fixture, no Home Assistant needed
 	@echo "http://localhost:8777/dev/preview.html"
 	python3 -m http.server 8777
+
+HA_IMAGE ?= ghcr.io/home-assistant/home-assistant:stable
+HA_NAME := echolocal-ha
+HA_PORT ?= 8124
+
+DEV_PY := dev/.venv/bin/python
+
+$(DEV_PY):
+	python3 -m venv dev/.venv
+	dev/.venv/bin/pip install -q pyyaml websockets
+
+.PHONY: ha-up
+ha-up: build $(DEV_PY) ## Run a throwaway Home Assistant with this integration and the devices in dev/devices.yaml
+	@mkdir -p dev/ha
+	@docker rm -f $(HA_NAME) >/dev/null 2>&1 || true
+	docker run -d --name $(HA_NAME) -p $(HA_PORT):8123 \
+		-v $(CURDIR)/dev/ha:/config \
+		-v $(CURDIR)/$(COMPONENT):/config/custom_components/echolocal:ro \
+		$(HA_IMAGE)
+	$(DEV_PY) dev/testha.py http://localhost:$(HA_PORT)
+	@echo "http://localhost:$(HA_PORT)  dev / dev"
+
+.PHONY: ha-restart
+ha-restart: build $(DEV_PY) ## Restart the throwaway Home Assistant to load integration changes
+	docker restart $(HA_NAME)
+	$(DEV_PY) dev/testha.py http://localhost:$(HA_PORT)
+
+.PHONY: ha-logs
+ha-logs: ## Follow the throwaway Home Assistant's log
+	docker logs -f $(HA_NAME)
+
+.PHONY: ha-down
+ha-down: ## Stop and remove the throwaway Home Assistant, keeping dev/ha
+	docker rm -f $(HA_NAME)
 
 .PHONY: clean
 clean: ## Remove build output and caches

@@ -19,7 +19,7 @@ from homeassistant.exceptions import HomeAssistantError, ServiceValidationError,
 from homeassistant.helpers import config_validation as cv, device_registry as dr
 from homeassistant.util import slugify
 
-from .const import ASSETS_DIR_NAME, DOMAIN, MANUFACTURER, TONES_DIR_NAME
+from .const import ASSETS_DIR_NAME, DOMAIN, MANUFACTURERS, TONES_DIR_NAME
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -375,7 +375,7 @@ def _online_nodes(hass: HomeAssistant) -> list[str]:
         info = getattr(data, "device_info", None)
         if info is None or not getattr(data, "available", False):
             continue
-        if info.manufacturer != MANUFACTURER:
+        if info.manufacturer not in MANUFACTURERS:
             continue
         nodes.append(info.name.replace("-", "_"))
     return nodes

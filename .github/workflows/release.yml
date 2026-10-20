@@ -1,0 +1,49 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Branch, tag or commit to build
+        required: true
+      prerelease:
+        description: Publish the zip as a prerelease (needs ref to be a tag)
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  zip:
+    name: Build echolocal.zip
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REF: ${{ github.event.release.tag_name || inputs.ref }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.REF }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - run: make zip VERSION="${REF#v}"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: echolocal-${{ env.REF }}
+          path: echolocal.zip
+      - name: Attach to the release
+        if: github.event_name == 'release'
+        run: gh release upload "$REF" echolocal.zip --clobber
+      - name: Publish a prerelease
+        if: github.event_name == 'workflow_dispatch' && inputs.prerelease
+        run: |
+          git rev-parse -q --verify "refs/tags/$REF" >/dev/null || { echo "::error::$REF is not a tag"; exit 1; }
+          gh release view "$REF" >/dev/null 2>&1 \
+            || gh release create "$REF" --prerelease --verify-tag --title "$REF" --notes "Test build of $REF"
+          gh release upload "$REF" echolocal.zip --clobber

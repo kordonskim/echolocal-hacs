@@ -1,0 +1,136 @@
+:host {
+  display: block;
+  --tint: color-mix(in srgb, var(--primary-text-color) 5%, transparent);
+}
+
+h2 {
+  margin: 20px 0 12px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--secondary-text-color);
+}
+
+h2.first {
+  margin-top: 0;
+}
+
+.list {
+  display: grid;
+  gap: 8px;
+}
+
+.action,
+.match {
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--tint);
+}
+
+.action {
+  display: grid;
+  gap: 6px;
+}
+
+.title {
+  font-weight: 500;
+}
+
+.quiet {
+  color: var(--secondary-text-color);
+  font-size: 0.85rem;
+}
+
+.devices {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  border: none;
+  background: none;
+  color: var(--secondary-text-color);
+  font-size: 0.85rem;
+  text-align: left;
+  cursor: pointer;
+  --mdc-icon-size: 16px;
+}
+
+.devices span {
+  flex: 1;
+}
+
+.picker {
+  display: grid;
+  gap: 4px;
+  max-height: 260px;
+  overflow-y: auto;
+  padding-top: 4px;
+  border-top: 1px solid var(--divider-color);
+}
+
+.device {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 2px;
+  font-size: 0.9rem;
+  --mdc-icon-size: 18px;
+}
+
+.device[data-offline="true"] {
+  opacity: 0.55;
+}
+
+.picture svg {
+  display: block;
+  width: 22px;
+  height: auto;
+}
+
+.state {
+  margin-left: auto;
+  color: var(--secondary-text-color);
+  font-size: 0.8rem;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+}
+
+code {
+  font-size: 0.8rem;
+  color: var(--secondary-text-color);
+}
+
+ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.fixed {
+  margin-left: 6px;
+  font-size: 0.8rem;
+  color: var(--secondary-text-color);
+}
+
+.match {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.when,
+.reply {
+  color: var(--secondary-text-color);
+  font-size: 0.85rem;
+}
+
+.spare {
+  color: var(--secondary-text-color);
+  font-size: 0.9rem;
+}
