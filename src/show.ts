@@ -1,4 +1,5 @@
 import { svg, type SVGTemplateResult } from "lit";
+import { unsafeSVG } from "lit/directives/unsafe-svg.js";
 
 import type { Lens } from "./boards";
 
@@ -63,10 +64,33 @@ export interface ShowState {
   covered: boolean;
 }
 
-const SX = 27;
-const SY = 33;
-const SW = 186;
-const SH = 93;
+export interface Box {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+const SHOW: Box = { x: 27, y: 33, w: 186, h: 93 };
+
+export interface PanelState {
+  picture: string;
+  box: Box;
+  screen: Screen;
+  muted: boolean;
+}
+
+export function panel(state: PanelState, tap: () => void): SVGTemplateResult {
+  const view = state.picture.match(/viewBox="([^"]+)"/)?.[1] ?? "0 0 320 190";
+  const inner = state.picture.replace(/^[\s\S]*?<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");
+
+  return svg`
+    <svg viewBox=${view} role="img" aria-label="Display">
+      ${unsafeSVG(inner)}
+      ${display(state.screen, state.box, state.muted, tap)}
+    </svg>
+  `;
+}
 
 export function show(
   state: ShowState,
@@ -96,45 +120,52 @@ export function show(
       <rect x="4" y="14" width="232" height="130" rx="16" fill="none" stroke="var(--el-edge)"></rect>
       <rect x="11" y="21" width="218" height="116" rx="10" fill="var(--el-glass)"></rect>
 
-      <g class="screen" role="button" tabindex="0" aria-label="Screen" @click=${tap.screen}>
-        <rect x=${SX} y=${SY} width=${SW} height=${SH} rx="2" fill=${screen.palette.background}></rect>
-        ${face(screen)}
-        <rect
-          x=${SX}
-          y=${SY}
-          width=${SW}
-          height=${SH}
-          rx="2"
-          fill="#000"
-          style="opacity:${(1 - screen.lit) * 0.7}"
-        ></rect>
-        <rect
-          class="bar"
-          data-muted=${String(state.muted)}
-          x=${SX}
-          y=${SY + SH - 3}
-          width=${SW}
-          height="3"
-        ></rect>
-      </g>
+      ${display(screen, SHOW, state.muted, tap.screen)}
 
       ${lens(state.lens, state.covered, tap.camera)}
     </svg>
   `;
 }
 
-function face(screen: Screen) {
-  const size = CLOCK[screen.size] ?? CLOCK.Medium;
+function display(screen: Screen, box: Box, muted: boolean, tap: () => void) {
+  const scale = box.h / SHOW.h;
+
+  return svg`<g class="screen" role="button" tabindex="0" aria-label="Screen" @click=${tap}>
+    <rect x=${box.x} y=${box.y} width=${box.w} height=${box.h} rx="2" fill=${screen.palette.background}></rect>
+    ${face(screen, box, scale)}
+    <rect
+      x=${box.x}
+      y=${box.y}
+      width=${box.w}
+      height=${box.h}
+      rx="2"
+      fill="#000"
+      style="opacity:${(1 - screen.lit) * 0.7}"
+    ></rect>
+    <rect
+      class="bar"
+      data-muted=${String(muted)}
+      x=${box.x}
+      y=${box.y + box.h - 3 * scale}
+      width=${box.w}
+      height=${3 * scale}
+    ></rect>
+  </g>`;
+}
+
+function face(screen: Screen, box: Box, scale: number) {
+  const size = (CLOCK[screen.size] ?? CLOCK.Medium) * scale;
   const lines = screen.date ? size * 0.42 : 0;
   const block = size * 0.8 + lines;
-  const middle = SX + SW / 2;
+  const middle = box.x + box.w / 2;
 
   let top: number;
-  if (screen.place === "Top") top = SY + 8;
-  else if (screen.place === "Bottom") top = SY + SH - 12 - block;
-  else top = SY + (SH - block) / 2;
+  if (screen.place === "Top") top = box.y + 8 * scale;
+  else if (screen.place === "Bottom") top = box.y + box.h - 12 * scale - block;
+  else top = box.y + (box.h - block) / 2;
 
-  const lineY = screen.place === "Bottom" ? SY + 12 : SY + SH - 9;
+  const lineY = screen.place === "Bottom" ? box.y + 12 * scale : box.y + box.h - 9 * scale;
+  const most = Math.round((44 * box.w) / (SHOW.w * scale));
 
   return svg`
     <text
@@ -159,8 +190,8 @@ function face(screen: Screen) {
           x=${middle}
           y=${lineY}
           text-anchor="middle"
-          style="fill:${screen.palette.muted}"
-        >${clip(screen.line, 44)}</text>`
+          style="font-size:${6.5 * scale}px;fill:${screen.palette.muted}"
+        >${clip(screen.line, most)}</text>`
       : ""}
   `;
 }

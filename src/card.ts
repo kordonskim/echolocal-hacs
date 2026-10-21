@@ -5,7 +5,6 @@
 
 import { LitElement, html, nothing, unsafeCSS } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { unsafeSVG } from "lit/directives/unsafe-svg.js";
 
 import { HOLD, SEGMENTS, art, type Lux, type Segment } from "./art";
 import { actionOf } from "./audio";
@@ -17,7 +16,7 @@ import { KEYS_READY } from "./keys";
 import { components, compose, diagnostics, settings, type Widget } from "./layout";
 import { disabledSegments, enable } from "./registry";
 import { lookOf, type Lens } from "./boards";
-import { DEFAULT_THEME, INKS, THEMES, show, type Screen } from "./show";
+import { DEFAULT_THEME, INKS, THEMES, panel, show, type Box, type Screen } from "./show";
 import {
   activity,
   deviceName,
@@ -187,7 +186,7 @@ export class EchoLocalSatelliteCard extends LitElement {
             style=${look.shape === "dot" ? "" : `max-width:${look.width}px`}
           >
             ${look.shape === "panel"
-              ? unsafeSVG(look.picture)
+              ? this.panel(state, doing, look.picture, look.screen)
               : look.shape === "show"
                 ? this.show(state, doing, look.lens)
                 : art(
@@ -249,6 +248,13 @@ export class EchoLocalSatelliteCard extends LitElement {
         mute: () => this.toggle("switch", state.mute),
         volume: (step) => this.volume(state, step),
       }
+    );
+  }
+
+  private panel(state: Satellite, doing: string, picture: string, box: Box) {
+    return panel(
+      { picture, box, screen: this.screen(state, doing), muted: isOn(this.hass, state.mute) },
+      () => this.open({ kind: "screen", slot: 0 })
     );
   }
 

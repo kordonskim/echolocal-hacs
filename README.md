@@ -7,7 +7,9 @@
 [![hacs][hacs-badge]][hacs] [![Validate](https://github.com/ygelfand/echolocal-hacs/actions/workflows/validate.yml/badge.svg)](https://github.com/ygelfand/echolocal-hacs/actions/workflows/validate.yml)
 
 An optional companion to [EchoLocal](https://github.com/ygelfand/echolocal), which turns Amazon Echo
-Dots and Echo Shows into Home Assistant voice satellites.
+Dots and Echo Shows into Home Assistant voice satellites, and to its sister project
+[LANovo](https://github.com/ygelfand/LANovo), which does the same for Lenovo Smart Displays. Both
+kinds of device share one dashboard.
 
 EchoLocal speaks the ESPHome native API, so Home Assistant already adopts each device and gives it
 an assist satellite and an entity for every setting, without this integration. This adds:
@@ -15,6 +17,7 @@ an assist satellite and an entity for every setting, without this integration. T
 - **A card** for each device, with its settings and controls
 - **A dashboard** in the sidebar with every device, plus wake words, tones, turn history, groups
   and health
+- **Fleet**: compare every device's settings with one of them and copy settings across
 - **Features the ESPHome protocol can't express**: the wake word library, custom tones and turn
   recordings
 - **Calls from a dashboard** to an Echo Show, with audio or video
@@ -63,6 +66,19 @@ available to all of them.
 Upload a sound and assign it to devices for alerts, timers and wake chimes.
 
 ![The tones tab: a custom chime assigned to four devices](docs/images/tones.png)
+
+### Groups
+
+Devices against groups. Groups are Home Assistant labels, so they work in automations too.
+
+### Fleet
+
+Pick a **Primary** device and see, setting by setting, which devices match it, differ, or don't have
+that setting. Tick settings and devices, then **Sync** to copy them from the primary; each row
+reports what changed. Sections collapse to one column with a checkbox for the whole section, label
+pills narrow the devices, an eye leaves a device out of the comparison, and **Local** lists settings
+that are never synced. Pipelines and wake words go through Home Assistant's own selects. Devices on
+older firmware show **needs an update**. Administrators only.
 
 ### Health
 
