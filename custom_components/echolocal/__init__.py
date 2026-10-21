@@ -10,7 +10,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.loader import async_get_integration
 
-from . import entities, ping, tones, triggers, wakewords, webrtc
+from . import call, entities, ping, tones, triggers, wakewords, webrtc
 from .const import (
     BUNDLE_FILE,
     CONF_SIDEBAR,
@@ -40,6 +40,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: EchoLocalEntry) -> bool:
         entities.async_setup(hass)
         ping.async_setup(hass)
         webrtc.async_setup(hass)
+        call.async_setup(hass)
 
     if entry.options.get(CONF_SIDEBAR, True):
         await _async_register_panel(hass, version)

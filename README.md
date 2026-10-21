@@ -17,17 +17,20 @@ an assist satellite and an entity for every setting, without this integration. T
   and health
 - **Features the ESPHome protocol can't express**: the wake word library, custom tones and turn
   recordings
+- **Calls from a dashboard** to an Echo Show, with audio or video
 
 ![The EchoLocal dashboard with Echo Dots and Echo Shows](docs/images/dashboard.png)
 
 ## The card
 
 Drawn like the device: a Dot with its ring and light level, or a Show with its screen. Buttons for
-the microphone, playback, ring, screen, posters, camera and each assistant open their settings.
+the microphone, playback, ring, screen, posters, camera and each assistant open their settings. On
+an Echo Show, the phone button calls it from the browser; sound and video go straight between the
+two, so the browser has to be on the same network.
 
 <p align="center">
   <img src="docs/images/card.png" width="360" alt="The card for an Echo Dot: the device from above, ring lit, showing the room's light level">
-  <img src="docs/images/card-show.png" width="360" alt="The card for an Echo Show 8, with buttons for microphone, playback, screen, posters, camera and both assistants">
+  <img src="docs/images/card-show.png" width="360" alt="The card for an Echo Show 8, with buttons for microphone, playback, screen, posters, camera, both assistants and calling">
 </p>
 
 <p align="center">

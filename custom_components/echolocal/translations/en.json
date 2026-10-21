@@ -62,6 +62,22 @@
         "entity_id": { "name": "Camera", "description": "The camera that was streamed." },
         "session": { "name": "Session", "description": "The session to close." }
       }
+    },
+    "call_answer": {
+      "name": "Answer a dashboard call",
+      "description": "Sent by a device when it answers a call from a dashboard.",
+      "fields": {
+        "session": { "name": "Session", "description": "The call being answered." },
+        "sdp": { "name": "Answer", "description": "The device's WebRTC answer." }
+      }
+    },
+    "call_end": {
+      "name": "End a dashboard call",
+      "description": "Sent by a device when a call from a dashboard ends.",
+      "fields": {
+        "session": { "name": "Session", "description": "The call that ended." },
+        "reason": { "name": "Reason", "description": "Why the call ended." }
+      }
     }
   }
 }

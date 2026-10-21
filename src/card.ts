@@ -8,6 +8,8 @@ import { customElement, property, state } from "lit/decorators.js";
 import { unsafeSVG } from "lit/directives/unsafe-svg.js";
 
 import { HOLD, SEGMENTS, art, type Lux, type Segment } from "./art";
+import { actionOf } from "./audio";
+import "./call";
 import styles from "./card.css";
 import "./dialog";
 import { helpForKind } from "./help";
@@ -96,6 +98,8 @@ export class EchoLocalSatelliteCard extends LitElement {
 
   @state() private now = new Date();
   private clock = 0;
+
+  @state() private calling = false;
 
   static getConfigElement() {
     return document.createElement("echolocal-satellite-card-editor");
@@ -217,6 +221,15 @@ export class EchoLocalSatelliteCard extends LitElement {
       </ha-card>
 
       ${this.popup(state)}
+      ${this.calling
+        ? html`<echolocal-call
+            .hass=${this.hass}
+            .deviceId=${state.device.id}
+            .name=${deviceName(state.device)}
+            .camera=${state.by.has("camera")}
+            @closed=${() => (this.calling = false)}
+          ></echolocal-call>`
+        : nothing}
     `;
   }
 
@@ -305,6 +318,9 @@ export class EchoLocalSatelliteCard extends LitElement {
         <div class="status">${ACTIVITY[doing] ?? doing}</div>
       </div>
       <div class="tail">
+        ${actionOf(this.hass, state.device.name ?? "", "call_offer")
+          ? this.square("mdi:phone", "Call", () => (this.calling = true))
+          : nothing}
         ${this.square(ICON.activity, "Activity", () => this.open({ kind: "activity", slot: 0 }))}
         ${this.square(ICON.device, "Settings", () => this.open({ kind: "device", slot: 0 }))}
         ${this.square(ICON.diagnostics, "Diagnostics", () =>

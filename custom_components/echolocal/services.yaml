@@ -61,3 +61,23 @@ camera_webrtc_close:
       required: true
       selector:
         text:
+call_answer:
+  fields:
+    session:
+      required: true
+      selector:
+        text:
+    sdp:
+      required: true
+      selector:
+        text:
+          multiline: true
+call_end:
+  fields:
+    session:
+      required: true
+      selector:
+        text:
+    reason:
+      selector:
+        text:
