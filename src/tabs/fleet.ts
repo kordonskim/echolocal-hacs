@@ -54,14 +54,14 @@ interface Result {
   errors: string[];
 }
 
-interface Column {
+interface Row {
   key: string;
   setting: Setting;
 }
 
 interface Section {
   title: string;
-  columns: Column[];
+  rows: Row[];
 }
 
 type Mark = "match" | "differs" | "na";
@@ -77,6 +77,8 @@ const LABELS: Record<Mark, string> = {
   differs: "Differs",
   na: "Doesn't apply",
 };
+
+const HIDDEN = new Set(["secret", "credential", "password"]);
 
 function keyOf(s: Setting): string {
   return `${s.domain}.${s.name}`;
@@ -94,8 +96,8 @@ export class EchoLocalFleet extends LitElement {
   @state() private master = "";
   @state() private scope = "";
   @state() private known: HassLabel[] = [];
-  @state() private columns = new Set<string>();
-  @state() private rows = new Set<string>();
+  @state() private keys = new Set<string>();
+  @state() private targets = new Set<string>();
   @state() private ignored = new Set<string>();
   @state() private folded = new Set<string>();
   @state() private everything = false;
@@ -157,11 +159,11 @@ export class EchoLocalFleet extends LitElement {
       <div class="bottom">
         ${this.said ? html`<span class="differs">${this.said}</span>` : nothing}
         <span class="quiet">
-          ${this.chosenColumns(sections).length} settings to ${this.rows.size}
-          ${this.rows.size === 1 ? "device" : "devices"}
+          ${this.chosen(sections).length} settings to ${this.targets.size}
+          ${this.targets.size === 1 ? "device" : "devices"}
         </span>
         <ha-button
-          .disabled=${this.busy || !this.rows.size || !this.chosenColumns(sections).length}
+          .disabled=${this.busy || !this.targets.size || !this.chosen(sections).length}
           .loading=${this.busy}
           @click=${() => this.sync(master, sections)}
         >
@@ -223,148 +225,164 @@ export class EchoLocalFleet extends LitElement {
 
   private renderTable(master: Device, sections: Section[], others: Device[]) {
     const online = others.filter((d) => this.selectable(d));
-    const all = online.length > 0 && online.every((d) => this.rows.has(d.id));
+    const all = online.length > 0 && online.every((d) => this.targets.has(d.id));
+    const keys = sections.flatMap((s) => s.rows.map((r) => r.key));
+    const picked = keys.filter((k) => this.keys.has(k)).length;
 
     return html`<table>
       <thead>
         <tr>
-          <th class="corner" rowspan="2">
-            <ha-checkbox
-              aria-label="Every device"
-              .checked=${all}
-              .indeterminate=${!all && this.rows.size > 0}
-              @change=${(e: Event) => this.allRows(online, (e.target as HTMLInputElement).checked)}
-            ></ha-checkbox>
+          <th class="corner">
+            <div class="corner-picks">
+              <label>
+                <ha-checkbox
+                  aria-label="Every setting"
+                  .checked=${keys.length > 0 && picked === keys.length}
+                  .indeterminate=${picked > 0 && picked < keys.length}
+                  @change=${(e: Event) => this.every(keys, (e.target as HTMLInputElement).checked)}
+                ></ha-checkbox>
+                <span>Settings</span>
+              </label>
+              <label>
+                <span>Devices</span>
+                <ha-checkbox
+                  aria-label="Every device"
+                  .checked=${all}
+                  .indeterminate=${!all && this.targets.size > 0}
+                  @change=${(e: Event) => this.allTargets(online, (e.target as HTMLInputElement).checked)}
+                ></ha-checkbox>
+              </label>
+            </div>
           </th>
-          ${sections.length
-            ? sections.map((s) => this.renderSectionHead(s))
-            : html`<th class="note" rowspan="2">
-                ${this.everything ? "Nothing to compare" : "Every device matches the primary"}
-              </th>`}
-          <th class="result" rowspan="2"></th>
-        </tr>
-        <tr>
-          ${sections.map((s) =>
-            this.folded.has(s.title)
-              ? this.renderGroupHead(s)
-              : s.columns.map((c) => this.renderColumnHead(c))
-          )}
+          <th class="device primary-device">
+            <div class="device-name">${master.name}</div>
+            <span class="tag">primary</span>
+          </th>
+          ${others.map((d) => this.renderDeviceHead(d))}
         </tr>
       </thead>
       <tbody>
-        <tr class="master-row">
-          <th class="who">${master.name}<span class="tag">primary</span></th>
-          ${sections.length ? nothing : html`<td></td>`}
-          ${sections.map((s) =>
-            this.folded.has(s.title)
-              ? html`<td class="summary"></td>`
-              : s.columns.map(() => html`<td></td>`)
-          )}
-          <td class="result"></td>
-        </tr>
-        ${others.map((d) => this.renderRow(d, sections))}
+        ${sections.length
+          ? sections.map((s) => this.renderSection(s, master, others))
+          : html`<tr>
+              <td class="note" colspan=${others.length + 2}>
+                ${this.everything ? "Nothing to compare" : "Every device matches the primary"}
+              </td>
+            </tr>`}
       </tbody>
     </table>`;
   }
 
-  private renderSectionHead(s: Section) {
-    const folded = this.folded.has(s.title);
-    return html`<th class="section" colspan=${folded ? 1 : s.columns.length}>
-      <button @click=${() => this.fold(s.title)}>
-        <ha-icon icon=${folded ? "mdi:chevron-right" : "mdi:chevron-down"}></ha-icon>
-        <span>${s.title}</span>
-      </button>
-    </th>`;
-  }
-
-  private renderColumnHead(c: Column) {
-    return html`<th class="column" title=${this.fullTitle(c.setting)}>
-      <div class="head">
-        <span class="label">${this.shortTitle(c.setting)}</span>
-        <ha-checkbox
-          aria-label=${this.fullTitle(c.setting)}
-          .checked=${this.columns.has(c.key)}
-          @change=${(e: Event) => this.toggle("columns", c.key, (e.target as HTMLInputElement).checked)}
-        ></ha-checkbox>
-      </div>
-    </th>`;
-  }
-
-  private renderGroupHead(s: Section) {
-    const on = s.columns.filter((c) => this.columns.has(c.key)).length;
-    const label = `${s.columns.length} ${s.columns.length === 1 ? "setting" : "settings"}`;
-    return html`<th class="column summary" title=${`${s.title}: ${on} of ${label}`}>
-      <div class="head">
-        <span class="label">${label}</span>
-        <ha-checkbox
-          aria-label=${`Every setting in ${s.title}`}
-          .checked=${on === s.columns.length}
-          .indeterminate=${on > 0 && on < s.columns.length}
-          @change=${(e: Event) => this.group(s, (e.target as HTMLInputElement).checked)}
-        ></ha-checkbox>
-      </div>
-    </th>`;
-  }
-
-  private renderRow(d: Device, sections: Section[]) {
+  private renderDeviceHead(d: Device) {
     const result = this.results.get(d.id);
     const ignored = this.ignored.has(d.id);
-    return html`<tr data-offline=${String(!this.selectable(d))}>
-      <th class="who">
-        <div class="name">
-          <label>
+    return html`<th class="device" data-offline=${String(!this.selectable(d))}>
+      <label class="device-name">
+        <ha-checkbox
+          .disabled=${!this.selectable(d)}
+          .checked=${this.targets.has(d.id)}
+          @change=${(e: Event) => this.toggle("targets", d.id, (e.target as HTMLInputElement).checked)}
+        ></ha-checkbox>
+        <span>${d.name}</span>
+      </label>
+      <div class="device-state">
+        ${!d.online
+          ? html`<span class="tag">offline</span>`
+          : d.error === "update"
+            ? html`<span class="tag">needs an update</span>`
+            : d.error
+              ? html`<span class="tag">unreadable</span>`
+              : nothing}
+        <button
+          class="ignore"
+          data-on=${String(ignored)}
+          title=${ignored ? `Compare ${d.name}` : `Ignore ${d.name}`}
+          aria-label=${ignored ? `Compare ${d.name}` : `Ignore ${d.name}`}
+          @click=${() => this.ignore(d.id, !ignored)}
+        >
+          <ha-icon icon=${ignored ? "mdi:eye-off-outline" : "mdi:eye-outline"}></ha-icon>
+        </button>
+      </div>
+      ${result ? html`<div class="result">${this.renderResult(result)}</div>` : nothing}
+    </th>`;
+  }
+
+  private renderSection(s: Section, master: Device, others: Device[]) {
+    const folded = this.folded.has(s.title);
+    const on = s.rows.filter((r) => this.keys.has(r.key)).length;
+    return html`
+      <tr class="section">
+        <th class="setting section-head">
+          <div class="setting-name">
             <ha-checkbox
-              .disabled=${!this.selectable(d)}
-              .checked=${this.rows.has(d.id)}
-              @change=${(e: Event) => this.toggle("rows", d.id, (e.target as HTMLInputElement).checked)}
+              aria-label=${`Every setting in ${s.title}`}
+              .checked=${on === s.rows.length}
+              .indeterminate=${on > 0 && on < s.rows.length}
+              @change=${(e: Event) => this.group(s, (e.target as HTMLInputElement).checked)}
             ></ha-checkbox>
-            <span>${d.name}</span>
-          </label>
-          ${!d.online
-            ? html`<span class="tag">offline</span>`
-            : d.error === "update"
-              ? html`<span class="tag">needs an update</span>`
-              : d.error
-                ? html`<span class="tag">unreadable</span>`
-                : nothing}
-          <button
-            class="ignore"
-            data-on=${String(ignored)}
-            title=${ignored ? `Compare ${d.name}` : `Ignore ${d.name}`}
-            aria-label=${ignored ? `Compare ${d.name}` : `Ignore ${d.name}`}
-            @click=${() => this.ignore(d.id, !ignored)}
-          >
-            <ha-icon icon=${ignored ? "mdi:eye-off-outline" : "mdi:eye-outline"}></ha-icon>
-          </button>
-        </div>
+            <button @click=${() => this.fold(s.title)}>
+              <ha-icon icon=${folded ? "mdi:chevron-right" : "mdi:chevron-down"}></ha-icon>
+              <span>${s.title}</span>
+              <span class="quiet">${s.rows.length}</span>
+            </button>
+          </div>
+        </th>
+        <td class="section-fill"></td>
+        ${others.map((d) => (folded ? this.renderSummary(d, s) : html`<td class="section-fill"></td>`))}
+      </tr>
+      ${folded ? nothing : s.rows.map((r) => this.renderRow(r, master, others))}
+    `;
+  }
+
+  private renderRow(r: Row, master: Device, others: Device[]) {
+    return html`<tr>
+      <th class="setting" title=${this.fullTitle(r.setting)}>
+        <label class="setting-name">
+          <ha-checkbox
+            aria-label=${this.fullTitle(r.setting)}
+            .checked=${this.keys.has(r.key)}
+            @change=${(e: Event) => this.toggle("keys", r.key, (e.target as HTMLInputElement).checked)}
+          ></ha-checkbox>
+          <span>${this.shortTitle(r.setting)}</span>
+        </label>
       </th>
-      ${sections.length ? nothing : html`<td></td>`}
-      ${sections.map((s) =>
-        this.folded.has(s.title) ? this.renderSummary(d, s) : s.columns.map((c) => this.renderCell(this.mark(d, c)))
-      )}
-      <td class="result">${result ? this.renderResult(result) : nothing}</td>
+      <td class="value">${this.shown(master.settings.find((s) => keyOf(s) === r.key) ?? r.setting)}</td>
+      ${others.map((d) => this.renderCell(d, r))}
     </tr>`;
   }
 
-  private renderCell(mark: Mark) {
-    return html`<td>
-      <span class="cell ${mark}" title=${LABELS[mark]}><ha-icon icon=${ICONS[mark]}></ha-icon></span>
+  private renderCell(d: Device, r: Row) {
+    const mark = this.mark(d, r);
+    const theirs = d.settings.find((s) => keyOf(s) === r.key);
+    const title = mark === "differs" && theirs ? `${LABELS[mark]}: ${this.shown(theirs)}` : LABELS[mark];
+    return html`<td data-offline=${String(!this.selectable(d))}>
+      <span class="cell ${mark}" title=${title}><ha-icon icon=${ICONS[mark]}></ha-icon></span>
     </td>`;
   }
 
   private renderSummary(d: Device, s: Section) {
-    const marks = s.columns.map((c) => this.mark(d, c));
+    const marks = s.rows.map((r) => this.mark(d, r));
     const differs = marks.filter((m) => m === "differs").length;
     if (differs) {
-      return html`<td class="summary"><span class="count">${differs} differ</span></td>`;
+      return html`<td data-offline=${String(!this.selectable(d))}>
+        <span class="count">${differs} differ</span>
+      </td>`;
     }
-    return this.renderCell(marks.includes("match") ? "match" : "na");
+    const mark: Mark = marks.includes("match") ? "match" : "na";
+    return html`<td data-offline=${String(!this.selectable(d))}>
+      <span class="cell ${mark}" title=${LABELS[mark]}><ha-icon icon=${ICONS[mark]}></ha-icon></span>
+    </td>`;
   }
 
   private renderResult(r: Result) {
     if (r.errors.length) return html`<span class="differs" title=${r.errors.join("\n")}>${r.errors[0]}</span>`;
     const skipped = r.skipped.length ? `, ${r.skipped.length} skipped` : "";
     return html`<span class="match">${r.changed} changed${skipped}</span>`;
+  }
+
+  private shown(s: Setting): string {
+    if (HIDDEN.has(s.kind)) return s.value ? "••••••" : "";
+    return s.value;
   }
 
   private syncable(d: Device): boolean {
@@ -393,29 +411,29 @@ export class EchoLocalFleet extends LitElement {
       .sort((a, b) => Number(b.online) - Number(a.online) || a.name.localeCompare(b.name));
   }
 
-  private mark(d: Device, c: Column): Mark {
+  private mark(d: Device, r: Row): Mark {
     if (!d.online) return "na";
-    const theirs = d.settings.find((s) => keyOf(s) === c.key);
+    const theirs = d.settings.find((s) => keyOf(s) === r.key);
     if (!theirs) return "na";
-    if (theirs.choices && !theirs.choices.includes(c.setting.value)) return "na";
-    return theirs.value === c.setting.value ? "match" : "differs";
+    if (theirs.choices && !theirs.choices.includes(r.setting.value)) return "na";
+    return theirs.value === r.setting.value ? "match" : "differs";
   }
 
-  private differs(c: Column, master: Device): boolean {
-    return this.others(master).some((d) => !this.ignored.has(d.id) && this.mark(d, c) === "differs");
+  private differs(r: Row, master: Device): boolean {
+    return this.others(master).some((d) => !this.ignored.has(d.id) && this.mark(d, r) === "differs");
   }
 
   private ignore(id: string, on: boolean) {
     const ignored = new Set(this.ignored);
-    const rows = new Set(this.rows);
+    const targets = new Set(this.targets);
     if (on) {
       ignored.add(id);
-      rows.delete(id);
+      targets.delete(id);
     } else {
       ignored.delete(id);
     }
     this.ignored = ignored;
-    this.rows = rows;
+    this.targets = targets;
     this.defaults();
   }
 
@@ -425,17 +443,17 @@ export class EchoLocalFleet extends LitElement {
     for (const s of master.settings) {
       const key = keyOf(s);
       if (local.has(key)) continue;
-      const column = { key, setting: s };
-      if (!this.everything && !this.differs(column, master)) continue;
-      const section = out.get(s.section) ?? { title: s.section, columns: [] };
-      section.columns.push(column);
+      const row = { key, setting: s };
+      if (!this.everything && !this.differs(row, master)) continue;
+      const section = out.get(s.section) ?? { title: s.section, rows: [] };
+      section.rows.push(row);
       out.set(s.section, section);
     }
     return [...out.values()];
   }
 
-  private chosenColumns(sections: Section[]): string[] {
-    return sections.flatMap((s) => s.columns.map((c) => c.key)).filter((k) => this.columns.has(k));
+  private chosen(sections: Section[]): string[] {
+    return sections.flatMap((s) => s.rows.map((r) => r.key)).filter((k) => this.keys.has(k));
   }
 
   private shortTitle(s: Setting): string {
@@ -449,14 +467,14 @@ export class EchoLocalFleet extends LitElement {
   private choose(id: string) {
     this.master = id;
     this.results = new Map();
-    this.rows = new Set();
+    this.targets = new Set();
     this.defaults();
   }
 
   private scopeTo(label: string) {
     this.scope = label;
     const shown = new Set(this.others(this.masterDevice()!).map((d) => d.id));
-    this.rows = new Set([...this.rows].filter((id) => shown.has(id)));
+    this.targets = new Set([...this.targets].filter((id) => shown.has(id)));
   }
 
   private fold(title: string) {
@@ -465,7 +483,7 @@ export class EchoLocalFleet extends LitElement {
     this.folded = next;
   }
 
-  private toggle(which: "columns" | "rows", key: string, on: boolean) {
+  private toggle(which: "keys" | "targets", key: string, on: boolean) {
     const next = new Set(this[which]);
     if (on) next.add(key);
     else next.delete(key);
@@ -473,26 +491,33 @@ export class EchoLocalFleet extends LitElement {
   }
 
   private group(s: Section, on: boolean) {
-    const next = new Set(this.columns);
-    for (const c of s.columns) {
-      if (on) next.add(c.key);
-      else next.delete(c.key);
-    }
-    this.columns = next;
+    this.every(
+      s.rows.map((r) => r.key),
+      on
+    );
   }
 
-  private allRows(online: Device[], on: boolean) {
-    this.rows = on ? new Set(online.map((d) => d.id)) : new Set();
+  private every(keys: string[], on: boolean) {
+    const next = new Set(this.keys);
+    for (const k of keys) {
+      if (on) next.add(k);
+      else next.delete(k);
+    }
+    this.keys = next;
+  }
+
+  private allTargets(online: Device[], on: boolean) {
+    this.targets = on ? new Set(online.map((d) => d.id)) : new Set();
   }
 
   private defaults() {
     const master = this.masterDevice();
     if (!master) return;
-    const columns = master.settings
+    const keys = master.settings
       .map((s) => ({ key: keyOf(s), setting: s }))
-      .filter((c) => this.differs(c, master))
-      .map((c) => c.key);
-    this.columns = new Set(columns);
+      .filter((r) => this.differs(r, master))
+      .map((r) => r.key);
+    this.keys = new Set(keys);
   }
 
   private async load() {
@@ -514,9 +539,9 @@ export class EchoLocalFleet extends LitElement {
       local: [...local],
     });
     this.fleet = { ...this.fleet!, local: saved.local };
-    const columns = new Set(this.columns);
-    if (on) columns.delete(key);
-    this.columns = columns;
+    const keys = new Set(this.keys);
+    if (on) keys.delete(key);
+    this.keys = keys;
   }
 
   private async sync(master: Device, sections: Section[]) {
@@ -526,13 +551,13 @@ export class EchoLocalFleet extends LitElement {
       const reply = await this.hass.callWS<{ results: Result[] }>({
         type: "echolocal/fleet/sync",
         primary: master.id,
-        targets: [...this.rows],
-        keys: this.chosenColumns(sections),
+        targets: [...this.targets],
+        keys: this.chosen(sections),
       });
       this.results = new Map(reply.results.map((r) => [r.id, r]));
-      const kept = this.columns;
+      const kept = this.keys;
       this.fleet = await this.hass.callWS<Fleet>({ type: "echolocal/fleet" });
-      this.columns = kept;
+      this.keys = kept;
     } catch (err) {
       this.said = `Sync failed: ${(err as Error).message ?? err}`;
     } finally {
