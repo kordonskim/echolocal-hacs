@@ -241,10 +241,11 @@ export class EchoLocalFleet extends LitElement {
                   .indeterminate=${picked > 0 && picked < keys.length}
                   @change=${(e: Event) => this.every(keys, (e.target as HTMLInputElement).checked)}
                 ></ha-checkbox>
-                <span>Settings</span>
+                <span>All settings</span>
               </label>
+              <span class="corner-split"></span>
               <label>
-                <span>Devices</span>
+                <span>All devices</span>
                 <ha-checkbox
                   aria-label="Every device"
                   .checked=${all}
@@ -258,7 +259,8 @@ export class EchoLocalFleet extends LitElement {
             <div class="device-name">${master.name}</div>
             <span class="tag">primary</span>
           </th>
-          ${others.map((d) => this.renderDeviceHead(d))}
+          ${others.map((d, i) => this.renderDeviceHead(d, others.length - i))}
+          <th class="gutter"></th>
         </tr>
       </thead>
       <tbody>
@@ -273,19 +275,17 @@ export class EchoLocalFleet extends LitElement {
     </table>`;
   }
 
-  private renderDeviceHead(d: Device) {
+  private renderDeviceHead(d: Device, stack: number) {
     const result = this.results.get(d.id);
     const ignored = this.ignored.has(d.id);
-    return html`<th class="device" data-offline=${String(!this.selectable(d))}>
-      <label class="device-name">
-        <ha-checkbox
-          .disabled=${!this.selectable(d)}
-          .checked=${this.targets.has(d.id)}
-          @change=${(e: Event) => this.toggle("targets", d.id, (e.target as HTMLInputElement).checked)}
-        ></ha-checkbox>
-        <span>${d.name}</span>
-      </label>
-      <div class="device-state">
+    return html`<th
+      class="device slanted"
+      style=${`z-index: ${stack + 2}`}
+      title=${d.name}
+      data-offline=${String(!this.selectable(d))}
+    >
+      <div class="device-label">
+        <span class="device-title">${d.name}</span>
         ${!d.online
           ? html`<span class="tag">offline</span>`
           : d.error === "update"
@@ -293,6 +293,9 @@ export class EchoLocalFleet extends LitElement {
             : d.error
               ? html`<span class="tag">unreadable</span>`
               : nothing}
+        ${result ? html`<span class="result">${this.renderResult(result)}</span>` : nothing}
+      </div>
+      <div class="device-controls">
         <button
           class="ignore"
           data-on=${String(ignored)}
@@ -302,8 +305,13 @@ export class EchoLocalFleet extends LitElement {
         >
           <ha-icon icon=${ignored ? "mdi:eye-off-outline" : "mdi:eye-outline"}></ha-icon>
         </button>
+        <ha-checkbox
+          aria-label=${`Sync ${d.name}`}
+          .disabled=${!this.selectable(d)}
+          .checked=${this.targets.has(d.id)}
+          @change=${(e: Event) => this.toggle("targets", d.id, (e.target as HTMLInputElement).checked)}
+        ></ha-checkbox>
       </div>
-      ${result ? html`<div class="result">${this.renderResult(result)}</div>` : nothing}
     </th>`;
   }
 

@@ -123,13 +123,29 @@ thead th {
 
 .corner {
   left: 0;
-  z-index: 3;
+  z-index: 1000;
   text-align: left;
 }
 
+th.gutter {
+  z-index: 1;
+  width: 140px;
+  min-width: 140px;
+  border-bottom: none;
+}
+
 .corner-picks {
-  display: grid;
-  gap: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.corner-split {
+  width: 1px;
+  height: 56px;
+  background: var(--divider-color);
+  transform: rotate(45deg);
 }
 
 .corner-picks label {
@@ -140,9 +156,6 @@ thead th {
   color: var(--secondary-text-color);
 }
 
-.corner-picks label:last-child {
-  justify-content: flex-end;
-}
 
 .device {
   min-width: 96px;
@@ -157,6 +170,44 @@ thead th {
   gap: 2px;
   white-space: normal;
   line-height: 1.2;
+}
+
+th.slanted {
+  width: 44px;
+  min-width: 44px;
+  max-width: 44px;
+  height: 168px;
+  padding: 0 0 4px;
+}
+
+.slanted .device-label {
+  position: absolute;
+  bottom: 84px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: max-content;
+  max-width: 200px;
+  transform: rotate(-45deg);
+  transform-origin: 0 100%;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.slanted .device-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slanted .result {
+  white-space: nowrap;
+}
+
+.device-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .primary-device {

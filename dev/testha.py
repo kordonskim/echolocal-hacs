@@ -1,5 +1,6 @@
 import argparse
 import json
+import socket
 import subprocess
 import sys
 import time
@@ -93,13 +94,14 @@ def key(device):
     path = KEYS.get(device.get("product", ""))
     if not path:
         return None
-    serial = device.get("adb")
+    serial = device.get("adb") or f"{device['host']}:5555"
     if serial not in attached():
-        serial = f"{device['host']}:5555"
-        subprocess.run(["adb", "connect", serial], capture_output=True, timeout=15)
+        subprocess.run(["adb", "connect", serial], capture_output=True, timeout=5)
+        if serial not in attached():
+            raise LookupError(f"{serial} is not attached")
     for cmd in (["cat", path], ["su", "-c", f"cat {path}"]):
         out = subprocess.run(
-            ["adb", "-s", serial, "shell", *cmd], capture_output=True, text=True, timeout=15
+            ["adb", "-s", serial, "shell", *cmd], capture_output=True, text=True, timeout=5
         )
         if out.returncode == 0 and out.stdout.strip():
             return out.stdout.strip()
@@ -134,6 +136,14 @@ def quiet(base, token):
             print(f"{entity_id}: disabled")
 
 
+def reachable(host, port):
+    try:
+        socket.create_connection((host, port), timeout=2).close()
+    except OSError:
+        return False
+    return True
+
+
 def attached():
     out = subprocess.run(["adb", "devices"], capture_output=True, text=True, timeout=15).stdout
     return {f[0] for f in (line.split() for line in out.splitlines()[1:]) if f[1:] == ["device"]}
@@ -160,6 +170,9 @@ def main():
     for device in (config or {}).get("devices", []):
         name = device.get("name", device["host"])
         answers = {"host": device["host"], "port": device.get("port", 6053)}
+        if not reachable(answers["host"], answers["port"]):
+            print(f"{name}: skipped, {answers['host']}:{answers['port']} does not answer")
+            continue
         try:
             if psk := key(device):
                 answers["noise_psk"] = psk

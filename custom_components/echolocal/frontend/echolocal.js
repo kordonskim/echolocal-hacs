@@ -1629,7 +1629,7 @@ var Ir=Object.defineProperty;var Ur=Object.getOwnPropertyDescriptor;var c=(a,r,e
         <code>${e.action}</code>
         <span class="reply">${e.reply||"silent"}</span>
       </div>
-    `}name(e){return k(this.hass.devices?.[e])||e}};ae.styles=b(zr),c([m({attribute:!1})],ae.prototype,"hass",2),c([u()],ae.prototype,"snapshot",2),c([u()],ae.prototype,"open",2),ae=c([v("echolocal-actions")],ae);var Er=`:host{display:block;--tint: color-mix(in srgb, var(--primary-text-color) 5%, transparent);--good: var(--success-color, #43a047);--bad: var(--error-color, #db4437)}.top{position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:14px}.primary{min-width:220px}.search{padding:6px 10px;border:1px solid var(--divider-color);border-radius:8px;background:var(--card-background-color);color:var(--primary-text-color);font:inherit}.spacer{flex:1}.toggle{display:flex;align-items:center;gap:6px;font-size:.85rem;color:var(--secondary-text-color)}.local{display:flex;align-items:center;gap:6px;padding:6px 11px;border:none;border-radius:10px;background:var(--tint);color:var(--primary-text-color);font:inherit;font-size:.85rem;cursor:pointer;--mdc-icon-size: 16px}.popover{position:absolute;top:100%;right:0;z-index:4;display:grid;gap:8px;width:min(360px,100%);margin-top:6px;padding:12px;border:1px solid var(--divider-color);border-radius:12px;background:var(--card-background-color);box-shadow:0 6px 24px #0003}.hint,.quiet,.spare{color:var(--secondary-text-color);font-size:.85rem}.options{display:grid;gap:2px;max-height:320px;overflow-y:auto}.options label{display:flex;align-items:center;gap:8px;padding:3px 2px;font-size:.85rem}.scroll{max-height:calc(100vh - 260px);overflow:auto;border-radius:12px;background:var(--tint)}table{border-collapse:separate;border-spacing:0;font-size:.85rem}th,td{padding:4px 8px;text-align:center;white-space:nowrap}thead th{position:sticky;top:0;z-index:2;vertical-align:bottom;background:var(--card-background-color);border-bottom:1px solid var(--divider-color)}.corner{left:0;z-index:3;text-align:left}.corner-picks{display:grid;gap:2px}.corner-picks label{display:flex;align-items:center;gap:4px;font-weight:500;color:var(--secondary-text-color)}.corner-picks label:last-child{justify-content:flex-end}.device{min-width:96px;max-width:160px;font-weight:500}.device-name{display:flex;align-items:center;justify-content:center;gap:2px;white-space:normal;line-height:1.2}.primary-device{border-left:1px solid var(--divider-color);border-right:1px solid var(--divider-color)}.device-state{display:flex;align-items:center;justify-content:center;gap:2px;min-height:28px}.device[data-offline=true],td[data-offline=true]{opacity:.45}.device[data-offline=true] .ignore[data-on=true]{opacity:1}.ignore{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;padding:0;border:none;border-radius:50%;background:none;color:var(--secondary-text-color);cursor:pointer;opacity:.35;--mdc-icon-size: 18px}.ignore:hover{background:var(--tint)}.device:hover .ignore,.ignore[data-on=true]{opacity:1}.tag{padding:1px 6px;border-radius:6px;background:var(--tint);color:var(--secondary-text-color);font-size:.72rem;font-weight:400}.setting{position:sticky;left:0;z-index:1;min-width:220px;max-width:320px;background:var(--card-background-color);text-align:left;font-weight:400}.setting-name{display:flex;align-items:center;gap:6px}.setting-name span{overflow:hidden;text-overflow:ellipsis}.section-head{padding-top:10px}.section-head button{display:flex;align-items:center;gap:6px;padding:2px 0;border:none;background:none;color:var(--secondary-text-color);font:inherit;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;--mdc-icon-size: 16px}.section-head .quiet{font-size:.72rem;font-weight:400;text-transform:none;letter-spacing:0}tr.section th,tr.section td{border-top:1px solid var(--divider-color)}tbody tr:not(.section)+tr:not(.section) th,tbody tr:not(.section)+tr:not(.section) td{border-top:1px solid color-mix(in srgb,var(--divider-color) 50%,transparent)}.value{max-width:180px;overflow:hidden;text-overflow:ellipsis;color:var(--secondary-text-color);border-left:1px solid var(--divider-color);border-right:1px solid var(--divider-color)}.section-fill{border-left:none}.note{padding:12px 16px;color:var(--secondary-text-color);text-align:left}.cell{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;--mdc-icon-size: 16px}.cell.match{color:color-mix(in srgb,var(--good) 75%,var(--secondary-text-color))}.cell.differs{background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--bad) 35%,transparent)}.cell.na{color:color-mix(in srgb,var(--secondary-text-color) 45%,transparent);--mdc-icon-size: 14px}.count{padding:3px 8px;border-radius:8px;background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad);font-size:.78rem;font-weight:500}.match{color:var(--good)}.differs{color:var(--bad)}.result{font-size:.75rem;font-weight:400;white-space:normal}.bottom{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-top:14px}
+    `}name(e){return k(this.hass.devices?.[e])||e}};ae.styles=b(zr),c([m({attribute:!1})],ae.prototype,"hass",2),c([u()],ae.prototype,"snapshot",2),c([u()],ae.prototype,"open",2),ae=c([v("echolocal-actions")],ae);var Er=`:host{display:block;--tint: color-mix(in srgb, var(--primary-text-color) 5%, transparent);--good: var(--success-color, #43a047);--bad: var(--error-color, #db4437)}.top{position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:14px}.primary{min-width:220px}.search{padding:6px 10px;border:1px solid var(--divider-color);border-radius:8px;background:var(--card-background-color);color:var(--primary-text-color);font:inherit}.spacer{flex:1}.toggle{display:flex;align-items:center;gap:6px;font-size:.85rem;color:var(--secondary-text-color)}.local{display:flex;align-items:center;gap:6px;padding:6px 11px;border:none;border-radius:10px;background:var(--tint);color:var(--primary-text-color);font:inherit;font-size:.85rem;cursor:pointer;--mdc-icon-size: 16px}.popover{position:absolute;top:100%;right:0;z-index:4;display:grid;gap:8px;width:min(360px,100%);margin-top:6px;padding:12px;border:1px solid var(--divider-color);border-radius:12px;background:var(--card-background-color);box-shadow:0 6px 24px #0003}.hint,.quiet,.spare{color:var(--secondary-text-color);font-size:.85rem}.options{display:grid;gap:2px;max-height:320px;overflow-y:auto}.options label{display:flex;align-items:center;gap:8px;padding:3px 2px;font-size:.85rem}.scroll{max-height:calc(100vh - 260px);overflow:auto;border-radius:12px;background:var(--tint)}table{border-collapse:separate;border-spacing:0;font-size:.85rem}th,td{padding:4px 8px;text-align:center;white-space:nowrap}thead th{position:sticky;top:0;z-index:2;vertical-align:bottom;background:var(--card-background-color);border-bottom:1px solid var(--divider-color)}.corner{left:0;z-index:1000;text-align:left}th.gutter{z-index:1;width:140px;min-width:140px;border-bottom:none}.corner-picks{display:flex;align-items:center;justify-content:space-between;gap:12px}.corner-split{width:1px;height:56px;background:var(--divider-color);transform:rotate(45deg)}.corner-picks label{display:flex;align-items:center;gap:4px;font-weight:500;color:var(--secondary-text-color)}.device{min-width:96px;max-width:160px;font-weight:500}.device-name{display:flex;align-items:center;justify-content:center;gap:2px;white-space:normal;line-height:1.2}th.slanted{width:44px;min-width:44px;max-width:44px;height:168px;padding:0 0 4px}.slanted .device-label{position:absolute;bottom:84px;left:50%;display:flex;align-items:center;gap:6px;width:max-content;max-width:200px;transform:rotate(-45deg);transform-origin:0 100%;white-space:nowrap;pointer-events:none}.slanted .device-title{overflow:hidden;text-overflow:ellipsis}.slanted .result{white-space:nowrap}.device-controls{display:flex;flex-direction:column;align-items:center}.primary-device{border-left:1px solid var(--divider-color);border-right:1px solid var(--divider-color)}.device-state{display:flex;align-items:center;justify-content:center;gap:2px;min-height:28px}.device[data-offline=true],td[data-offline=true]{opacity:.45}.device[data-offline=true] .ignore[data-on=true]{opacity:1}.ignore{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;padding:0;border:none;border-radius:50%;background:none;color:var(--secondary-text-color);cursor:pointer;opacity:.35;--mdc-icon-size: 18px}.ignore:hover{background:var(--tint)}.device:hover .ignore,.ignore[data-on=true]{opacity:1}.tag{padding:1px 6px;border-radius:6px;background:var(--tint);color:var(--secondary-text-color);font-size:.72rem;font-weight:400}.setting{position:sticky;left:0;z-index:1;min-width:220px;max-width:320px;background:var(--card-background-color);text-align:left;font-weight:400}.setting-name{display:flex;align-items:center;gap:6px}.setting-name span{overflow:hidden;text-overflow:ellipsis}.section-head{padding-top:10px}.section-head button{display:flex;align-items:center;gap:6px;padding:2px 0;border:none;background:none;color:var(--secondary-text-color);font:inherit;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;--mdc-icon-size: 16px}.section-head .quiet{font-size:.72rem;font-weight:400;text-transform:none;letter-spacing:0}tr.section th,tr.section td{border-top:1px solid var(--divider-color)}tbody tr:not(.section)+tr:not(.section) th,tbody tr:not(.section)+tr:not(.section) td{border-top:1px solid color-mix(in srgb,var(--divider-color) 50%,transparent)}.value{max-width:180px;overflow:hidden;text-overflow:ellipsis;color:var(--secondary-text-color);border-left:1px solid var(--divider-color);border-right:1px solid var(--divider-color)}.section-fill{border-left:none}.note{padding:12px 16px;color:var(--secondary-text-color);text-align:left}.cell{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;--mdc-icon-size: 16px}.cell.match{color:color-mix(in srgb,var(--good) 75%,var(--secondary-text-color))}.cell.differs{background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--bad) 35%,transparent)}.cell.na{color:color-mix(in srgb,var(--secondary-text-color) 45%,transparent);--mdc-icon-size: 14px}.count{padding:3px 8px;border-radius:8px;background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad);font-size:.78rem;font-weight:500}.match{color:var(--good)}.differs{color:var(--bad)}.result{font-size:.75rem;font-weight:400;white-space:normal}.bottom{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-top:14px}
 `;R({path:"fleet",title:"Fleet",icon:"mdi:compare-horizontal",element:"echolocal-fleet",order:32,admin:!0});var Pr={match:"mdi:check",differs:"mdi:not-equal-variant",na:"mdi:minus"},Ot={match:"Matches",differs:"Differs",na:"Doesn't apply"},Ca=new Set(["secret","credential","password"]);function _e(a){return`${a.domain}.${a.name}`}var _=class extends g{constructor(){super(...arguments);this.failed="";this.said="";this.master="";this.scope="";this.known=[];this.keys=new Set;this.targets=new Set;this.ignored=new Set;this.folded=new Set;this.everything=!1;this.picking=!1;this.search="";this.busy=!1;this.results=new Map;this.asked=!1}updated(){this.asked||!this.hass||(this.asked=!0,this.load(),ke(this.hass).then(e=>this.known=e))}render(){if(!this.hass)return p;if(this.failed)return l`<div class="spare">${this.failed}</div>`;if(!this.fleet)return l`<div class="spare">Reading every device…</div>`;let e=this.masterDevice(),t=this.sources();if(!e)return l`<div class="spare">No device is online to compare against.</div>`;let i=this.sections(e),s=this.others(e);return l`
       <div class="top">
         <ha-select
@@ -1709,10 +1709,11 @@ var Ir=Object.defineProperty;var Ur=Object.getOwnPropertyDescriptor;var c=(a,r,e
                   .indeterminate=${d>0&&d<o.length}
                   @change=${h=>this.every(o,h.target.checked)}
                 ></ha-checkbox>
-                <span>Settings</span>
+                <span>All settings</span>
               </label>
+              <span class="corner-split"></span>
               <label>
-                <span>Devices</span>
+                <span>All devices</span>
                 <ha-checkbox
                   aria-label="Every device"
                   .checked=${n}
@@ -1726,7 +1727,8 @@ var Ir=Object.defineProperty;var Ur=Object.getOwnPropertyDescriptor;var c=(a,r,e
             <div class="device-name">${e.name}</div>
             <span class="tag">primary</span>
           </th>
-          ${i.map(h=>this.renderDeviceHead(h))}
+          ${i.map((h,f)=>this.renderDeviceHead(h,i.length-f))}
+          <th class="gutter"></th>
         </tr>
       </thead>
       <tbody>
@@ -1736,28 +1738,34 @@ var Ir=Object.defineProperty;var Ur=Object.getOwnPropertyDescriptor;var c=(a,r,e
               </td>
             </tr>`}
       </tbody>
-    </table>`}renderDeviceHead(e){let t=this.results.get(e.id),i=this.ignored.has(e.id);return l`<th class="device" data-offline=${String(!this.selectable(e))}>
-      <label class="device-name">
-        <ha-checkbox
-          .disabled=${!this.selectable(e)}
-          .checked=${this.targets.has(e.id)}
-          @change=${s=>this.toggle("targets",e.id,s.target.checked)}
-        ></ha-checkbox>
-        <span>${e.name}</span>
-      </label>
-      <div class="device-state">
+    </table>`}renderDeviceHead(e,t){let i=this.results.get(e.id),s=this.ignored.has(e.id);return l`<th
+      class="device slanted"
+      style=${`z-index: ${t+2}`}
+      title=${e.name}
+      data-offline=${String(!this.selectable(e))}
+    >
+      <div class="device-label">
+        <span class="device-title">${e.name}</span>
         ${e.online?e.error==="update"?l`<span class="tag">needs an update</span>`:e.error?l`<span class="tag">unreadable</span>`:p:l`<span class="tag">offline</span>`}
+        ${i?l`<span class="result">${this.renderResult(i)}</span>`:p}
+      </div>
+      <div class="device-controls">
         <button
           class="ignore"
-          data-on=${String(i)}
-          title=${i?`Compare ${e.name}`:`Ignore ${e.name}`}
-          aria-label=${i?`Compare ${e.name}`:`Ignore ${e.name}`}
-          @click=${()=>this.ignore(e.id,!i)}
+          data-on=${String(s)}
+          title=${s?`Compare ${e.name}`:`Ignore ${e.name}`}
+          aria-label=${s?`Compare ${e.name}`:`Ignore ${e.name}`}
+          @click=${()=>this.ignore(e.id,!s)}
         >
-          <ha-icon icon=${i?"mdi:eye-off-outline":"mdi:eye-outline"}></ha-icon>
+          <ha-icon icon=${s?"mdi:eye-off-outline":"mdi:eye-outline"}></ha-icon>
         </button>
+        <ha-checkbox
+          aria-label=${`Sync ${e.name}`}
+          .disabled=${!this.selectable(e)}
+          .checked=${this.targets.has(e.id)}
+          @change=${n=>this.toggle("targets",e.id,n.target.checked)}
+        ></ha-checkbox>
       </div>
-      ${t?l`<div class="result">${this.renderResult(t)}</div>`:p}
     </th>`}renderSection(e,t,i){let s=this.folded.has(e.title),n=e.rows.filter(o=>this.keys.has(o.key)).length;return l`
       <tr class="section">
         <th class="setting section-head">
